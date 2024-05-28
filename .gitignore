@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+SGU$User.class
+SGU.class
+users.txt
