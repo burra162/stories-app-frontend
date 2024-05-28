@@ -21,12 +21,12 @@ const user = ref({
 onMounted(async () => {
   localStorage.removeItem("user");
   // if (localStorage.getItem("user") !== null) {
-  //   router.push({ name: "recipes" });
+  //   router.push({ name: "storys" });
   // }
 });
 
-function navigateToRecipes() {
-  router.push({ name: "recipes" });
+function navigateTostorys() {
+  router.push({ name: "storys" });
 }
 
 async function createAccount() {
@@ -52,7 +52,7 @@ async function login() {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Login successful!";
-      router.push({ name: "recipes" });
+      router.push({ name: "storys" });
     })
     .catch((error) => {
       console.log(error);
@@ -109,9 +109,9 @@ function closeSnackBar() {
             class="ml-2"
             variant="flat"
             color="secondary"
-            @click="navigateToRecipes()"
+            @click="navigateTostorys()"
           >
-            View Published Recipes
+            View Published storys
           </v-btn>
         </v-card-title>
       </v-card>
