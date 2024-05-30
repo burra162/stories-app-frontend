@@ -9,10 +9,14 @@ const router = useRouter();
 const user = ref(null);
 const title = ref("Stories App");
 const logoURL = ref("");
+const isAdmin = ref(false);
 
 onMounted(() => {
   logoURL.value = ocLogo;
   user.value = JSON.parse(localStorage.getItem("user"));
+  if (user.value !== null) {
+    isAdmin.value = user.value.type === "admin";
+  }
 });
 
 function logout() {
@@ -37,6 +41,9 @@ function logout() {
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
+
+      <v-btn v-if="isAdmin" class="mx-2" :to="{ name: 'genres' }"> Genres </v-btn>
+
       <v-menu v-if="user !== null" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">

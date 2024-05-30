@@ -17,6 +17,11 @@ const router = createRouter({
       path: "/user",
       name: "user",
       component: () => import("./views/UserPage.vue"),
+    },
+    {
+      path:"/genres",
+      name:"genres",
+      component: () => import("./views/GenrePage.vue"),
     }
   ],
 });
