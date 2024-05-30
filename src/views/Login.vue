@@ -30,12 +30,30 @@ function navigateTostorys() {
 }
 
 async function createAccount() {
+  if (
+    user.value.firstName === "" ||
+    user.value.lastName === "" ||
+    user.value.email === "" ||
+    user.value.password === ""
+  ) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "All fields are required!";
+    return;
+  }
+
   await UserServices.addUser(user.value)
     .then(() => {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Account created successfully!";
-      router.push({ name: "login" });
+      closeCreateAccount();
+      user.value = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      };
     })
     .catch((error) => {
       console.log(error);
@@ -46,6 +64,12 @@ async function createAccount() {
 }
 
 async function login() {
+  if (user.value.email === "" || user.value.password === "") {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "All fields are required!";
+    return;
+  }
   await UserServices.loginUser(user)
     .then((data) => {
       window.localStorage.setItem("user", JSON.stringify(data.data));
@@ -91,6 +115,7 @@ function closeSnackBar() {
             v-model="user.password"
             label="Password"
             required
+            type="password"
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
@@ -111,7 +136,7 @@ function closeSnackBar() {
             color="secondary"
             @click="navigateTostorys()"
           >
-            View Published storys
+            View Published stories
           </v-btn>
         </v-card-title>
       </v-card>
@@ -142,6 +167,7 @@ function closeSnackBar() {
               v-model="user.password"
               label="Password"
               required
+              type="password"
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
