@@ -169,6 +169,85 @@ function closePreview() {
   previewDialog.value = false;
 }
 
+const chats = ref([]);
+
+const modifyDialog = ref(false);
+const modifyStory = ref({});
+
+function openModify(story) {
+  modifyDialog.value = true;
+  modifyStory.value = story;
+  getChats();
+}
+
+function closeModify() {
+  modifyDialog.value = false;
+}
+
+function getChats() {
+  StoryService.getChats(modifyStory.value.id)
+    .then((response) => {
+      chats.value = response.data;
+      // scroll dialog to bottom of the list
+      setTimeout(() => {
+        const dialog = document.querySelector("#modifyDialog");
+        dialog.scrollTop = dialog.scrollHeight;
+      }, 100);
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error fetching chats";
+      snackbar.value.value = true;
+    });
+}
+
+const chat = ref({
+  message: "",
+  storyId: modifyStory.value.id,
+});
+
+function sendMessage() {
+  if (chat.value.message === "") {
+    snackbar.value.color = "error";
+    snackbar.value.text = "Please fill all fields";
+    snackbar.value.value = true;
+    return;
+  }
+  StoryService.addChat(modifyStory.value.id, chat.value)
+    .then((response) => {
+      snackbar.value.color = "green";
+      snackbar.value.text = "Message sent successfully";
+      snackbar.value.value = true;
+      chat.value.message = "";
+      getChats();
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error sending message";
+      snackbar.value.value = true;
+    });
+}
+
+
+
+function publish(message) {
+  modifyStory.value.published = true;
+  modifyStory.value.description = message;
+  StoryService.updateStory(modifyStory.value)
+    .then((response) => {
+      snackbar.value.color = "green";
+      snackbar.value.text = "Story published successfully";
+      snackbar.value.value = true;
+      closeModify();
+      getStories();
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error publishing story";
+      snackbar.value.value = true;
+    });
+
+}
 
 
 </script>
@@ -259,6 +338,60 @@ function closePreview() {
         </v-card>
       </v-dialog>
 
+
+      <v-dialog id="modifyDialog" v-model="modifyDialog" max-width="800px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Modify Story</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row v-for="chat in chats">
+                <v-col cols="12">
+                  <v-card :color="chat.role === 'User' ? 'secondary' : 'teal'">
+                    <v-card-title>{{ chat.role }}</v-card-title>
+                    <v-card-text>{{ chat.message }}</v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="primary" text @click="publish(chat.message)">Publish this story</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+              <v-col cols="12">
+                <v-text-field v-model="chat.message" label="Message"></v-text-field>
+              </v-col>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="flat" color="secondary" text @click="closeModify()">Close</v-btn>
+            <v-btn variant="flat" color="primary" text @click="sendMessage()">Send</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+
+      <v-dialog  v-model="previewDialog" max-width="800px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ previewStory.title }}</span>
+            <v-chip class="ma-2" color="primary" label>
+              {{ previewStory.genre }}
+            </v-chip>
+          </v-card-title>
+          <v-card-text v-if="story.description.length > 0" >
+              {{ story.description }}
+            </v-card-text>
+            <v-card-text v-else class="single-line-text">
+              Start using the AI to generate a story.
+            </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <v-snackbar v-model="snackbar.value" rounded="pill">
         {{ snackbar.text }}
