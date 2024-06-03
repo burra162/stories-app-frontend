@@ -157,7 +157,17 @@ function getStories() {
 }
 
 
+const previewStory = ref({});
+const previewDialog = ref(false);
 
+function openPreview(story) {
+  previewDialog.value = true;
+  previewStory.value = story;
+}
+
+function closePreview() {
+  previewDialog.value = false;
+}
 
 
 
@@ -177,13 +187,22 @@ function getStories() {
 
       <v-row>
         <v-col v-for="story in stories" :key="story.id" cols="12" md="6" lg="4">
-          <v-card class="mb-4">
-            <v-card-title class="headline">{{ story.title }}</v-card-title>
-            <v-card-text>
-              <p>{{ story.genre }}</p>
+          <v-card class="mb-4" @click="openPreview(story)">
+            <v-card-title class="headline">{{ story.title }}
+              <v-chip class="ma-2" color="primary" label>
+                {{ story.genre }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text v-if="story.description.length > 0" class="single-line-text">
+              {{ story.description }}
+            </v-card-text>
+            <v-card-text v-else class="single-line-text">
+              Start using the AI to generate a story.
             </v-card-text>
             <v-card-actions>
               <v-btn color="primary" @click="openEdit(story)">Edit</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -240,6 +259,7 @@ function getStories() {
         </v-card>
       </v-dialog>
 
+
       <v-snackbar v-model="snackbar.value" rounded="pill">
         {{ snackbar.text }}
 
@@ -252,3 +272,12 @@ function getStories() {
     </div>
   </v-container>
 </template>
+
+
+<style scoped>
+.single-line-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
