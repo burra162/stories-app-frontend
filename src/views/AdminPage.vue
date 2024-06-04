@@ -381,8 +381,8 @@ function publish(message) {
               {{ previewStory.genre }}
             </v-chip>
           </v-card-title>
-          <v-card-text v-if="story.description.length > 0" >
-              {{ story.description }}
+          <v-card-text v-if="previewStory.description.length > 0" >
+              {{ previewStory.description }}
             </v-card-text>
             <v-card-text v-else class="single-line-text">
               Start using the AI to generate a story.
