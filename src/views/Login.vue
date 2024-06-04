@@ -19,23 +19,41 @@ const user = ref({
 });
 
 onMounted(async () => {
-  localStorage.removeItem("user");
-  // if (localStorage.getItem("user") !== null) {
-  //   router.push({ name: "storys" });
-  // }
+  if (localStorage.getItem("user") !== null) {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user.type === "admin") {
+      router.push({ name: "admin" });
+    } else {
+      router.push({ name: "user" });
+    }
+  }
 });
 
-function navigateTostorys() {
-  router.push({ name: "storys" });
-}
-
 async function createAccount() {
+  if (
+    user.value.firstName === "" ||
+    user.value.lastName === "" ||
+    user.value.email === "" ||
+    user.value.password === ""
+  ) {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "All fields are required!";
+    return;
+  }
+
   await UserServices.addUser(user.value)
     .then(() => {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Account created successfully!";
-      router.push({ name: "login" });
+      closeCreateAccount();
+      user.value = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      };
     })
     .catch((error) => {
       console.log(error);
@@ -46,13 +64,23 @@ async function createAccount() {
 }
 
 async function login() {
+  if (user.value.email === "" || user.value.password === "") {
+    snackbar.value.value = true;
+    snackbar.value.color = "error";
+    snackbar.value.text = "All fields are required!";
+    return;
+  }
   await UserServices.loginUser(user)
     .then((data) => {
       window.localStorage.setItem("user", JSON.stringify(data.data));
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Login successful!";
-      router.push({ name: "storys" });
+      if (data.data.type === "admin") {
+        router.push({ name: "admin" });
+      } else {
+        router.push({ name: "user" });
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -91,6 +119,7 @@ function closeSnackBar() {
             v-model="user.password"
             label="Password"
             required
+            type="password"
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
@@ -101,19 +130,6 @@ function closeSnackBar() {
 
           <v-btn variant="flat" color="primary" @click="login()">Login</v-btn>
         </v-card-actions>
-      </v-card>
-
-      <v-card class="rounded-lg elevation-5 my-8">
-        <v-card-title class="text-center headline">
-          <v-btn
-            class="ml-2"
-            variant="flat"
-            color="secondary"
-            @click="navigateTostorys()"
-          >
-            View Published storys
-          </v-btn>
-        </v-card-title>
       </v-card>
 
       <v-dialog persistent v-model="isCreateAccount" width="800">
@@ -142,6 +158,7 @@ function closeSnackBar() {
               v-model="user.password"
               label="Password"
               required
+              type="password"
             ></v-text-field>
           </v-card-text>
           <v-card-actions>

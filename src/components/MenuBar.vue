@@ -7,12 +7,16 @@ import UserServices from "../services/UserServices";
 const router = useRouter();
 
 const user = ref(null);
-const title = ref("Storys App");
+const title = ref("Stories App");
 const logoURL = ref("");
+const isAdmin = ref(false);
 
 onMounted(() => {
   logoURL.value = ocLogo;
   user.value = JSON.parse(localStorage.getItem("user"));
+  if (user.value !== null) {
+    isAdmin.value = user.value.type === "admin";
+  }
 });
 
 function logout() {
@@ -32,23 +36,14 @@ function logout() {
 <template>
   <div>
     <v-app-bar color="primary" app dark>
-      <router-link :to="{ name: 'storys' }">
-        <v-img
-          class="mx-2"
-          :src="logoURL"
-          height="50"
-          width="50"
-          contain
-        ></v-img>
-      </router-link>
+
       <v-toolbar-title class="title">
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn class="mx-2" :to="{ name: 'storys' }"> storys </v-btn>
-      <v-btn v-if="user === null" class="mx-2" :to="{ name: 'login' }">
-        Login
-      </v-btn>
+
+      <v-btn v-if="isAdmin" class="mx-2" :to="{ name: 'genres' }"> Genres </v-btn>
+
       <v-menu v-if="user !== null" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
