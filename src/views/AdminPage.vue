@@ -389,7 +389,7 @@ function publish(message) {
             </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
+              <v-btn color="green" @click="openModify(previewStory)">Modify story</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
