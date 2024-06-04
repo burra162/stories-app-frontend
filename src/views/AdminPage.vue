@@ -105,6 +105,7 @@ const storyEdit = ref({
 function openEdit(story) {
   editDialog.value = true;
   storyEdit.value = story;
+  previewDialog.value = false;
 }
 
 function closeEdit() {
@@ -266,16 +267,16 @@ function publish(message) {
 
       <v-row>
         <v-col v-for="story in stories" :key="story.id" cols="12" md="6" lg="4">
-          <v-card class="mb-4" @click="openPreview(story)">
-            <v-card-title class="headline">{{ story.title }}
+          <v-card class="mb-4" >
+            <v-card-title  @click="openPreview(story)" class="headline">{{ story.title }}
               <v-chip class="ma-2" color="primary" label>
                 {{ story.genre }}
               </v-chip>
             </v-card-title>
-            <v-card-text v-if="story.description.length > 0" class="single-line-text">
+            <v-card-text @click="openPreview(story)" v-if="story.description.length > 0" class="single-line-text">
               {{ story.description }}
             </v-card-text>
-            <v-card-text v-else class="single-line-text">
+            <v-card-text @click="openPreview(story)"  v-else class="single-line-text">
               Start using the AI to generate a story.
             </v-card-text>
             <v-card-actions>
