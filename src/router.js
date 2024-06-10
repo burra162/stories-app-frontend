@@ -22,6 +22,11 @@ const router = createRouter({
       path:"/genres",
       name:"genres",
       component: () => import("./views/GenrePage.vue"),
+    },  
+    {
+      path:"/profile",
+      name:"profile",
+      component: () => import("./views/ProfilePage.vue"),
     }
   ],
 });

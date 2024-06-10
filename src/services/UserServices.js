@@ -23,4 +23,7 @@ export default {
   logoutUser() {
     return apiClient.post("logout");
   },
+  updateUser(user) {
+    return apiClient.put("users/" + user.id, user);
+  },
 };
