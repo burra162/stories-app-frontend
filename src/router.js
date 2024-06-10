@@ -19,14 +19,18 @@ const router = createRouter({
       component: () => import("./views/UserPage.vue"),
     },
     {
-      path:"/genres",
-      name:"genres",
+      path: "/genres",
+      name: "genres",
       component: () => import("./views/GenrePage.vue"),
-    },  
+    },
     {
-      path:"/profile",
-      name:"profile",
+      path: "/profile",
+      name: "profile",
       component: () => import("./views/ProfilePage.vue"),
+    }, {
+      path: "/password-reset",
+      name: "password-reset",
+      component: () => import("./views/PasswordResetPage.vue"),
     }
   ],
 });

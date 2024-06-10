@@ -2,7 +2,6 @@
 import ocLogo from "/oc_logo.png";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import UserServices from "../services/UserServices";
 
 const router = useRouter();
 
@@ -13,23 +12,17 @@ const isAdmin = ref(false);
 
 onMounted(() => {
   logoURL.value = ocLogo;
-  user.value = JSON.parse(localStorage.getItem("user"));  
+  user.value = JSON.parse(localStorage.getItem("user"));
   if (user.value !== null) {
     if (user.value.type === "admin") {
       isAdmin.value = true;
-    }else{
+    } else {
       isAdmin.value = false;
     }
   }
-  else{
-    router.push({ name: "login" });
-  }
 });
 
-
-
 function openProfile() {
-  console.log("Opening profile");
   router.push({ name: "profile" });
 }
 </script>
@@ -45,13 +38,13 @@ function openProfile() {
 
       <v-btn v-if="isAdmin" class="mx-2" :to="{ name: 'genres' }"> Genres </v-btn>
 
-      <v-menu v-if="user !== null" min-width="200px"  rounded>
+      <v-menu v-if="user !== null" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
-          <v-btn  @click="openProfile" icon v-bind="props">
+          <v-btn @click="openProfile" icon v-bind="props">
             <v-avatar class="mx-auto text-center" color="accent" size="large">
               <span class="white--text font-weight-bold">{{
-                `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
-              }}</span>
+          `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
+                }}</span>
             </v-avatar>
           </v-btn>
         </template>
