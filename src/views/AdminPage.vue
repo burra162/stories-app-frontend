@@ -1,11 +1,15 @@
 <script setup>
 import { onMounted } from "vue";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
 import StoryService from "../services/StoryService.js";
+import GenreComponent from "../components/GenreComponent.vue";
 
 import GenreService from "../services/GenreService";
 
 const user = ref({});
+const router = useRouter();
 
 const snackbar = ref({
   value: false,
@@ -15,10 +19,13 @@ const snackbar = ref({
 
 const genres = ref([]);
 
+const actualGenres = ref([]);
+
 
 function getGenres() {
   GenreService.getGenres()
     .then((response) => {
+      actualGenres.value = response.data;
       genres.value = response.data.map((genre) => genre.name);
     })
     .catch((error) => {
@@ -32,8 +39,12 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
+const isAdmin = ref(false);
+
+
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem("user"));
+  isAdmin.value = user.value !== null && user.value.type === "admin";
   getGenres();
   getStories();
 
@@ -249,13 +260,35 @@ function publish(message) {
     });
 
 }
+function openStory(stor) {
+    router.push("/story/" + stor.id);
+}
 
+
+function openStoryList(genre) {
+  router.push({ name: "stories", params: { genre: genre.name } });
+}
 
 </script>
 
 <template>
   <v-container>
     <div id="body">
+
+      <v-row class="mb-4">
+        <v-col cols="10"><v-card-title class="pl-0 text-h4 font-weight-bold">Genres
+          </v-card-title>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col v-for="genre in actualGenres" :key="genre" cols="12" md="6" lg="3">
+          <genre-component :genre="genre"  @click="openStoryList(genre)"></genre-component>
+        </v-col>
+      </v-row>
+
+
+
       <v-row align="center" class="mb-4">
         <v-col cols="10"><v-card-title class="pl-0 text-h4 font-weight-bold">Stories
           </v-card-title>
@@ -266,20 +299,20 @@ function publish(message) {
       </v-row>
 
       <v-row>
-        <v-col v-for="story in stories" :key="story.id" cols="12" md="6" lg="4">
-          <v-card class="mb-4" >
-            <v-card-title  @click="openPreview(story)" class="headline">{{ story.title }}
+        <v-col v-for="story in stories" :key="story.id" cols="12" md="6" lg="3">
+          <v-card class="mb-4">
+            <v-card-title @click="openStory(story)" class="headline">{{ story.title }}
               <v-chip class="ma-2" color="primary" label>
                 {{ story.genre }}
               </v-chip>
             </v-card-title>
-            <v-card-text @click="openPreview(story)" v-if="story.description.length > 0" class="single-line-text">
+            <v-card-text @click="openStory(story)" v-if="story.description.length > 0" class="single-line-text">
               {{ story.description }}
             </v-card-text>
-            <v-card-text @click="openPreview(story)"  v-else class="single-line-text">
-              Start using the AI to generate a story.
+            <v-card-text @click="openStory(story)" v-else class="single-line-text">
+              Start writing a story.
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions v-if="isAdmin">
               <v-btn color="primary" @click="openEdit(story)">Edit</v-btn>
               <v-spacer></v-spacer>
               <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
@@ -373,7 +406,7 @@ function publish(message) {
       </v-dialog>
 
 
-      <v-dialog  v-model="previewDialog" max-width="800px">
+      <v-dialog v-model="previewDialog" max-width="800px">
         <v-card>
           <v-card-title>
             <span class="headline">{{ previewStory.title }}</span>
@@ -381,15 +414,15 @@ function publish(message) {
               {{ previewStory.genre }}
             </v-chip>
           </v-card-title>
-          <v-card-text v-if="previewStory.description.length > 0" >
-              {{ previewStory.description }}
-            </v-card-text>
-            <v-card-text v-else class="single-line-text">
-              Start using the AI to generate a story.
-            </v-card-text>
+          <v-card-text v-if="previewStory.description.length > 0">
+            {{ previewStory.description }}
+          </v-card-text>
+          <v-card-text v-else class="single-line-text">
+            Start using the AI to generate a story.
+          </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-              <v-btn color="green" @click="openModify(previewStory)">Modify story</v-btn>
+            <v-btn color="green" @click="openModify(previewStory)">Modify story</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

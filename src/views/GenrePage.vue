@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { ref } from "vue";
 import GenreService from "../services/GenreService.js";
+import GenreComponent from "../components/GenreComponent.vue";
 
 
 const user = ref(null);
@@ -37,7 +38,8 @@ onMounted(() => {
 });
 
 const genre = ref({
-    name: ""
+    name: "",
+    image: "",
 });
 
 const addDialog = ref(false);
@@ -59,6 +61,17 @@ function addGenre() {
         };
         return;
     }
+    if (genre.value.image === "") {
+        snackbar.value = {
+            value: true,
+            color: "error",
+            text: "Genre image is required",
+        };
+        return;
+    }
+
+
+
     GenreService.addGenre(genre.value)
         .then((response) => {
             genres.value.push(response.data);
@@ -127,13 +140,8 @@ function updateGenre() {
             </v-row>
 
             <v-row>
-                <v-col v-for="genre in genres" :key="genre.id" cols="12" md="6" lg="4">
-                    <v-card class="mb-4">
-                        <v-card-title>{{ genre.name }}</v-card-title>
-                        <v-card-actions>
-                            <v-btn color="primary" @click="openEdit(genre)">Edit</v-btn>
-                        </v-card-actions>
-                    </v-card>
+                <v-col v-for="genre in genres" :key="genre.id" cols="12" md="6" lg="3">
+                    <GenreComponent :genre="genre" @edit-genre="openEdit"/>
                 </v-col>
             </v-row>
 
@@ -144,6 +152,7 @@ function updateGenre() {
                     <v-card-title class="headline mb-2">Create Genre </v-card-title>
                     <v-card-text>
                         <v-text-field v-model="genre.name" label="Genre" required></v-text-field>
+                        <v-text-field v-model="genre.image" label="Image" required></v-text-field>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
@@ -159,6 +168,7 @@ function updateGenre() {
                     <v-card-title class="headline mb-2">Edit Genre </v-card-title>
                     <v-card-text>
                         <v-text-field v-model="genre.name" label="Genre" required></v-text-field>
+                        <v-text-field v-model="genre.image" label="Image" required></v-text-field>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
