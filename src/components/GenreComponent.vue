@@ -19,10 +19,6 @@ const emit = defineEmits(['edit-genre']);
 
 
 onMounted(() => {
-
-    // print props 
-    console.log(props.genre);
-    console.log(props.showEdit);
     user.value = JSON.parse(localStorage.getItem("user"));
     if (user.value !== null) {
         if (user.value.type === "admin") {

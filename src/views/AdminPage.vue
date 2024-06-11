@@ -47,6 +47,7 @@ onMounted(() => {
   isAdmin.value = user.value !== null && user.value.type === "admin";
   getGenres();
   getStories();
+  getFavoriteStories();
 
 });
 
@@ -261,12 +262,26 @@ function publish(message) {
 
 }
 function openStory(stor) {
-    router.push("/story/" + stor.id);
+  router.push("/story/" + stor.id);
 }
 
 
 function openStoryList(genre) {
   router.push({ name: "stories", params: { genre: genre.name } });
+}
+
+const favoriteStories = ref([]);
+
+function getFavoriteStories() {
+  StoryService.getFavoriteStories(user.value.id)
+    .then((response) => {
+      favoriteStories.value = response.data;
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error fetching favorite stories";
+      snackbar.value.value = true;
+    });
 }
 
 </script>
@@ -283,7 +298,7 @@ function openStoryList(genre) {
 
       <v-row>
         <v-col v-for="genre in actualGenres" :key="genre" cols="12" md="6" lg="3">
-          <genre-component :genre="genre"  @click="openStoryList(genre)"></genre-component>
+          <genre-component :genre="genre" @click="openStoryList(genre)"></genre-component>
         </v-col>
       </v-row>
 
@@ -300,6 +315,37 @@ function openStoryList(genre) {
 
       <v-row>
         <v-col v-for="story in stories" :key="story.id" cols="12" md="6" lg="3">
+          <v-card class="mb-4">
+            <v-card-title @click="openStory(story)" class="headline">{{ story.title }}
+              <v-chip class="ma-2" color="primary" label>
+                {{ story.genre }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text @click="openStory(story)" v-if="story.description.length > 0" class="single-line-text">
+              {{ story.description }}
+            </v-card-text>
+            <v-card-text @click="openStory(story)" v-else class="single-line-text">
+              Start writing a story.
+            </v-card-text>
+            <v-card-actions v-if="isAdmin">
+              <v-btn color="primary" @click="openEdit(story)">Edit</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+
+
+      <v-row align="center" class="mb-4">
+        <v-col cols="10">
+          <v-card-title class="pl-0 text-h4 font-weight-bold">Favorite Stories
+          </v-card-title>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col v-for="story in favoriteStories" :key="story.id" cols="12" md="6" lg="3">
           <v-card class="mb-4">
             <v-card-title @click="openStory(story)" class="headline">{{ story.title }}
               <v-chip class="ma-2" color="primary" label>
