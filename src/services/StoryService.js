@@ -46,6 +46,31 @@ export default {
 
     getSuggestedStories(userId) {
         return apiClient.get("stories/suggested/" + userId);
-    }
+    },
+
+    // get all favorite stories for a user
+    getFavoriteStories(userId) {
+        return apiClient.get("stories/favorite/" + userId);
+    },
+
+    // check if a story is favorite for a user
+
+    isFavorite(userId, storyId) {
+        return apiClient.get("stories/isFavorite/" + storyId + "/" + userId);
+    },
+
+    // add story to favorites for a user
+
+    addFavorite(userId, storyId) {
+        return apiClient.post("stories/addFavorite/" + storyId + "/" + userId);
+    },
+
+    // remove story from favorites for a user
+
+    removeFavorite(userId, storyId) {
+        return apiClient.delete("stories/removeFavorite/" + storyId + "/" + userId);
+    },
+
+
 
 }

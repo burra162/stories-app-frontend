@@ -16,26 +16,20 @@ const snackbar = ref({
     text: "",
 });
 
-
-function closeSnackBar() {
-    snackbar.value.value = false;
-}
-
 const genre = ref("");
 
 const stories = ref([]);
 
 
-onMounted(() => {
+onMounted(async () => {
     user.value = JSON.parse(localStorage.getItem("user"));
     genre.value = route.params.genre;
     if (genre.value === undefined) {
         // get all stories
-        getStories();
-
+        await getStories();
     } else {
         // get stories by genre
-        getStoriesByGenre();
+        await getStoriesByGenre();
     }
 });
 
@@ -57,14 +51,11 @@ async function getStoriesByGenre() {
     }
 }
 
-function closeEdit() {
-    editDialog.value = false;
-}
-
 function openStory(stor) {
     console.log(stor);
     router.push("/story/" + stor.id);
 }
+
 
 
 </script>
@@ -83,8 +74,6 @@ function openStory(stor) {
                     <v-card-text>
                         {{ story.description }}
                     </v-card-text>
-
-
                 </v-card>
             </v-col>
         </v-row>
