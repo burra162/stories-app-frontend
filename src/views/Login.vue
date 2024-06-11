@@ -101,6 +101,12 @@ function closeCreateAccount() {
 function closeSnackBar() {
   snackbar.value.value = false;
 }
+
+function  resetPassword() {
+  router.push({ name: "password-reset" });
+}
+
+
 </script>
 
 <template>
@@ -123,11 +129,10 @@ function closeSnackBar() {
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
-          <v-btn variant="flat" color="secondary" @click="openCreateAccount()"
-            >Create Account</v-btn
-          >
-          <v-spacer></v-spacer>
+          <v-btn variant="flat" color="secondary" @click="openCreateAccount()">Create Account</v-btn>
+          <v-btn  color="primary" @click="resetPassword()">Reset password</v-btn>
 
+          <v-spacer></v-spacer>
           <v-btn variant="flat" color="primary" @click="login()">Login</v-btn>
         </v-card-actions>
       </v-card>
@@ -169,9 +174,7 @@ function closeSnackBar() {
               @click="closeCreateAccount()"
               >Close</v-btn
             >
-            <v-btn variant="flat" color="primary" @click="createAccount()"
-              >Create Account</v-btn
-            >
+            <v-btn variant="flat" color="primary" @click="createAccount()">Create Account</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

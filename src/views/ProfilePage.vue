@@ -43,6 +43,9 @@ function update() {
     });
 }
 
+function  resetPassword() {
+  router.push({ name: "password-reset" });
+}
 
 function logout() {
   UserServices.logoutUser()
@@ -86,6 +89,7 @@ function logout() {
               </v-row>
             </v-card-text>
             <v-card-actions>
+              <v-btn color="primary" @click="resetPassword">Reset password</v-btn>
               <v-spacer></v-spacer>
               <v-btn variant="flat" color="primary" @click="update">Update profile</v-btn>
             </v-card-actions>

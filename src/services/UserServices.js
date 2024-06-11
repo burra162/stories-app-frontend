@@ -26,4 +26,7 @@ export default {
   updateUser(user) {
     return apiClient.put("users/" + user.id, user);
   },
+  resetPassword(user) {
+    return apiClient.post("users/reset-password", user);
+  }
 };
