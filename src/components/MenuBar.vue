@@ -25,13 +25,23 @@ onMounted(() => {
 function openProfile() {
   router.push({ name: "profile" });
 }
+
+
+function navigateHome() {
+  if (user.value === null) {
+    router.push({ name: "login" });
+  } else {
+    router.push({ name: "home" });
+  }
+}
+
 </script>
 
 <template>
   <div>
     <v-app-bar color="primary" app dark>
 
-      <v-toolbar-title class="title">
+      <v-toolbar-title @click="navigateHome"class="title">
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>

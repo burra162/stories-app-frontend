@@ -20,12 +20,7 @@ const user = ref({
 
 onMounted(async () => {
   if (localStorage.getItem("user") !== null) {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user.type === "admin") {
-      router.push({ name: "admin" });
-    } else {
-      router.push({ name: "user" });
-    }
+    router.push({ name: "home" });
   }
 });
 
@@ -76,11 +71,7 @@ async function login() {
       snackbar.value.value = true;
       snackbar.value.color = "green";
       snackbar.value.text = "Login successful!";
-      if (data.data.type === "admin") {
-        router.push({ name: "admin" });
-      } else {
-        router.push({ name: "user" });
-      }
+      router.push({ name: "home" });
     })
     .catch((error) => {
       console.log(error);
@@ -102,7 +93,7 @@ function closeSnackBar() {
   snackbar.value.value = false;
 }
 
-function  resetPassword() {
+function resetPassword() {
   router.push({ name: "password-reset" });
 }
 
@@ -115,22 +106,13 @@ function  resetPassword() {
       <v-card class="rounded-lg elevation-5">
         <v-card-title class="headline mb-2">Login </v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="user.email"
-            label="Email"
-            required
-          ></v-text-field>
+          <v-text-field v-model="user.email" label="Email" required></v-text-field>
 
-          <v-text-field
-            v-model="user.password"
-            label="Password"
-            required
-            type="password"
-          ></v-text-field>
+          <v-text-field v-model="user.password" label="Password" required type="password"></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-btn variant="flat" color="secondary" @click="openCreateAccount()">Create Account</v-btn>
-          <v-btn  color="primary" @click="resetPassword()">Reset password</v-btn>
+          <v-btn color="primary" @click="resetPassword()">Reset password</v-btn>
 
           <v-spacer></v-spacer>
           <v-btn variant="flat" color="primary" @click="login()">Login</v-btn>
@@ -141,39 +123,17 @@ function  resetPassword() {
         <v-card class="rounded-lg elevation-5">
           <v-card-title class="headline mb-2">Create Account </v-card-title>
           <v-card-text>
-            <v-text-field
-              v-model="user.firstName"
-              label="First Name"
-              required
-            ></v-text-field>
+            <v-text-field v-model="user.firstName" label="First Name" required></v-text-field>
 
-            <v-text-field
-              v-model="user.lastName"
-              label="Last Name"
-              required
-            ></v-text-field>
+            <v-text-field v-model="user.lastName" label="Last Name" required></v-text-field>
 
-            <v-text-field
-              v-model="user.email"
-              label="Email"
-              required
-            ></v-text-field>
+            <v-text-field v-model="user.email" label="Email" required></v-text-field>
 
-            <v-text-field
-              v-model="user.password"
-              label="Password"
-              required
-              type="password"
-            ></v-text-field>
+            <v-text-field v-model="user.password" label="Password" required type="password"></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              variant="flat"
-              color="secondary"
-              @click="closeCreateAccount()"
-              >Close</v-btn
-            >
+            <v-btn variant="flat" color="secondary" @click="closeCreateAccount()">Close</v-btn>
             <v-btn variant="flat" color="primary" @click="createAccount()">Create Account</v-btn>
           </v-card-actions>
         </v-card>
@@ -183,11 +143,7 @@ function  resetPassword() {
         {{ snackbar.text }}
 
         <template v-slot:actions>
-          <v-btn
-            :color="snackbar.color"
-            variant="text"
-            @click="closeSnackBar()"
-          >
+          <v-btn :color="snackbar.color" variant="text" @click="closeSnackBar()">
             Close
           </v-btn>
         </template>

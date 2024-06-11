@@ -9,14 +9,9 @@ const router = createRouter({
       component: () => import("./views/Login.vue"),
     },
     {
-      path: "/admin",
-      name: "admin",
+      path: "/home",
+      name: "home",
       component: () => import("./views/AdminPage.vue"),
-    },
-    {
-      path: "/user",
-      name: "user",
-      component: () => import("./views/UserPage.vue"),
     },
     {
       path: "/genres",
@@ -31,6 +26,16 @@ const router = createRouter({
       path: "/password-reset",
       name: "password-reset",
       component: () => import("./views/PasswordResetPage.vue"),
+    },
+    {
+      path: "/stories/:genre",
+      name: "stories",
+      component: () => import("./views/StoriesPage.vue"),
+    },
+    {
+      path: "/story/:id",
+      name: "story",
+      component: () => import("./views/StoryPreviewPage.vue"),
     }
   ],
 });

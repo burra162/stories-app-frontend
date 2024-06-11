@@ -31,4 +31,21 @@ export default {
     addChat(storyId, chat) {
         return apiClient.post("stories/" + storyId + "/chat", chat);
     },
+    
+    // get stories by genre
+    getStoriesByGenre(genre) {
+        return apiClient.get("stories/genre/" + genre);
+    },
+
+    // get stories by author
+    getStoriesByAuthor(author) {
+        return apiClient.get("stories/author/" + author);
+    },
+
+    // get user suggested storires
+
+    getSuggestedStories(userId) {
+        return apiClient.get("stories/suggested/" + userId);
+    }
+
 }
