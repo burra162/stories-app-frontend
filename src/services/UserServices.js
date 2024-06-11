@@ -28,5 +28,11 @@ export default {
   },
   resetPassword(user) {
     return apiClient.post("users/reset-password", user);
-  }
+  },
+  updateGenres(userId, genres) {
+    return apiClient.put("users/" + userId + "/genres", genres);
+  },
+  getUserGenres(userId) {
+    return apiClient.get("users/" + userId + "/genres");
+  },
 };
