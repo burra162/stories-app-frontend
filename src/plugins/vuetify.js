@@ -11,7 +11,7 @@ const OCTheme = {
     primary: "#80162B",
     secondary: "#E1E1E1",
     accent: "#47121D",
-    success: "#47121D",
+    success: "#3CB043",
     error: "#EE5044",
     teal: "#63BAC0",
     blue: "#196CA2",
