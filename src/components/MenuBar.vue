@@ -47,6 +47,7 @@ function navigateHome() {
       <v-spacer></v-spacer>
 
       <v-btn v-if="isAdmin" class="mx-2" :to="{ name: 'genres' }"> Genres </v-btn>
+      <v-btn v-if="isAdmin" class="mx-2" :to="{ name: 'users' }"> Users </v-btn>
 
       <v-menu v-if="user !== null" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
