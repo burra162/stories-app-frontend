@@ -16,12 +16,17 @@ const snackbar = ref({
     text: "",
 });
 
+const review = ref({
+    review: "",
+});
 
 const story = ref(null);
+const reviews = ref([]);
 
 onMounted(() => {
     user.value = JSON.parse(localStorage.getItem("user"));
     getStory();
+    getReviews();
 });
 
 
@@ -32,6 +37,34 @@ async function getStory() {
         isFavoriteStory();
     } catch (error) {
         console.log(error);
+    }
+}
+
+
+async function getReviews() {
+    try {
+        const response = await StoryService.getReviews(route.params.id);
+        reviews.value = response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function addReview() {
+    try {
+        review.value.storyId = story.value.id;
+        review.value.userId = user.value.id;
+        await StoryService.addReview(review.value);
+        snackbar.value = {
+            value: true,
+            color: "green",
+            text: "Review added",
+        };
+        getReviews();
+    } catch (error) {
+        snackbar.value.color = "red";
+        snackbar.value.text = "Error adding review";
+        snackbar.value.value = true;
     }
 }
 
@@ -87,7 +120,7 @@ async function isFavoriteStory() {
 
         <v-row class="mx-5 my-5">
             <v-card v-if="story !== null">
-                <v-card-actions  class="headline mx-5">
+                <v-card-actions class="headline mx-5">
                     <h3>{{ story.title }}</h3>
                     <v-chip class="ma-2" color="primary" label>
                         {{ story.genre }}
@@ -98,9 +131,47 @@ async function isFavoriteStory() {
                 </v-card-actions>
                 <v-card-text>
                     {{ story.description }}
+
+
+
+                    <v-divider v-if="reviews.length > 0" class="mx-2 my-5"></v-divider>
+                    <v-list v-if="reviews.length > 0">
+                        <v-list-item  class="review my-3" v-for="review in reviews" :key="review.id">
+                            <v-list-item-title >
+                                {{ review.review }}
+                            </v-list-item-title>
+                            <v-list-item-subtitle class="my-5"> By 
+                                {{ review.user.firstname }} {{ review.user.lastname }}
+                            </v-list-item-subtitle>
+                        </v-list-item>
+                    </v-list>
+
+                    <v-divider class="mx-2 my-5"></v-divider>
+
+                    <v-textarea v-model="review.review" label="Add review" outlined></v-textarea>
+                    <v-btn @click="addReview(review.review)" color="primary">Add review</v-btn>
                 </v-card-text>
             </v-card>
         </v-row>
 
+        <v-snackbar v-model="snackbar.value" rounded="pill">
+            {{ snackbar.text }}
+
+            <template v-slot:actions>
+                <v-btn :color="snackbar.color" variant="text" @click="closeSnackBar()">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-container>
 </template>
+
+
+<style scoped>
+
+.review {
+    background-color: #cbf0f1;
+    border-radius: 10px;
+    
+}
+</style>
