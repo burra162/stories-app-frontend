@@ -48,7 +48,7 @@ onMounted(() => {
   getGenres();
   getStories();
   getFavoriteStories();
-
+  getReadingList();
 });
 
 const addDialog = ref(false);
@@ -284,6 +284,20 @@ function getFavoriteStories() {
     });
 }
 
+const readingList = ref([]);
+
+function getReadingList() {
+  StoryService.getReadingList(user.value.id)
+    .then((response) => {
+      readingList.value = response.data;
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error fetching reading list";
+      snackbar.value.value = true;
+    });
+}
+
 </script>
 
 <template>
@@ -337,9 +351,9 @@ function getFavoriteStories() {
       </v-row>
 
 
-      <v-row align="center" class="mb-4">
+      <v-row align="center" v-if="favoriteStories.length>0" class="mb-4">
         <v-col cols="10">
-          <v-card-title class="pl-0 text-h4 font-weight-bold">Favorite Stories
+          <v-card-title  class="pl-0 text-h4 font-weight-bold">Favorite Stories
           </v-card-title>
         </v-col>
       </v-row>
@@ -366,6 +380,36 @@ function getFavoriteStories() {
           </v-card>
         </v-col>
       </v-row>
+
+      <v-row align="center" v-if="readingList.length>0" class="mb-4">
+        <v-col cols="10">
+          <v-card-title  class="pl-0 text-h4 font-weight-bold">Reading List
+          </v-card-title>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col v-for="story in readingList" :key="story.id" cols="12" md="6" lg="3">
+          <v-card class="mb-4">
+            <v-card-title @click="openStory(story)" class="headline">{{ story.title }}
+              <v-chip class="ma-2" color="primary" label>
+                {{ story.genre }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text @click="openStory(story)" v-if="story.description.length > 0" class="single-line-text">
+              {{ story.description }}
+            </v-card-text>
+            <v-card-text @click="openStory(story)" v-else class="single-line-text">
+              Start writing a story.
+            </v-card-text>
+            <v-card-actions v-if="isAdmin">
+              <v-btn color="primary" @click="openEdit(story)">Edit</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+        </v-row>
 
 
       <v-dialog persistent v-model="addDialog" max-width="800px">

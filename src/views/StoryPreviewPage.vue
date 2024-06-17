@@ -74,6 +74,46 @@ function closeEdit() {
 
 
 const isFavorite = ref(false);
+const isInReadingList = ref(false);
+
+async function isInReadingListStory() {
+    try {
+        const response = await StoryService.isInReadingList(user.value.id, story.value.id);
+        isInReadingList.value = response.data.isInReadingList;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function addReadingList() {
+    try {
+        await StoryService.addReadingList(user.value.id, story.value.id);
+        snackbar.value = {
+            value: true,
+            color: "success",
+            text: "Story added to reading list",
+        };
+        isInReadingList.value = true;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function removeReadingList() {
+    try {
+        await StoryService.removeReadingList(user.value.id, story.value.id);
+        snackbar.value = {
+            value: true,
+            color: "success",
+            text: "Story removed from reading list",
+        };
+        isInReadingList.value = false;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 
 async function addFavorite() {
     try {
@@ -166,43 +206,49 @@ async function updateReview() {
     <v-container>
 
         <v-row class="mx-5 my-5">
-            <v-card v-if="story !== null">
-                <v-card-actions class="headline mx-5">
-                    <h3>{{ story.title }}</h3>
-                    <v-chip class="ma-2" color="primary" label>
-                        {{ story.genre }}
-                    </v-chip>
-                    <v-spacer></v-spacer>
-                    <v-icon v-if="!isFavorite" color="red" icon @click="addFavorite">mdi-heart-outline</v-icon>
-                    <v-icon v-else color="red" icon @click="removeFavorite">mdi-heart</v-icon>
-                </v-card-actions>
-                <v-card-text>
-                    {{ story.description }}
+            <v-col cols="12">
+                <v-card v-if="story !== null">
+                    <v-card-actions class="headline mx-5">
+                        <h3>{{ story.title }}</h3>
+                        <v-chip class="ma-2" color="primary" label>
+                            {{ story.genre }}
+                        </v-chip>
+                        <v-spacer></v-spacer>
+                        <v-icon v-if="!isFavorite" color="red" icon @click="addFavorite">mdi-heart-outline</v-icon>
+                        <v-icon v-else color="red" icon @click="removeFavorite">mdi-heart</v-icon>
+
+                        <v-icon v-if="!isInReadingList" color="blue" icon
+                            @click="addReadingList">mdi-bookmark-outline</v-icon>
+                        <v-icon v-else color="blue" icon @click="removeReadingList">mdi-bookmark</v-icon>
+                    </v-card-actions>
+                    <v-card-text>
+                        {{ story.description }}
 
 
-                    <v-divider v-if="reviews.length > 0" class="mx-2 my-5"></v-divider>
-                    <v-list v-if="reviews.length > 0">
-                        <v-list-item class="review my-3" v-for="review in reviews" :key="review.id">
-                            <v-card-actions>
-                                <v-list-item-title> {{ review.review }} </v-list-item-title> <v-spacer></v-spacer>
-                                <v-list-item-action end v-if="review.user.id === user.id">
-                                    <v-icon class="mx-5" @click="deleteReview(review.id)">mdi-delete</v-icon>
-                                    <v-icon @click="editReview(review)">mdi-pencil</v-icon>
-                                </v-list-item-action>
+                        <v-divider v-if="reviews.length > 0" class="mx-2 my-5"></v-divider>
+                        <v-list v-if="reviews.length > 0">
+                            <v-list-item class="review my-3" v-for="review in reviews" :key="review.id">
+                                <v-card-actions>
+                                    <v-list-item-title> {{ review.review }} </v-list-item-title> <v-spacer></v-spacer>
+                                    <v-list-item-action end v-if="review.user.id === user.id">
+                                        <v-icon class="mx-5" @click="deleteReview(review.id)">mdi-delete</v-icon>
+                                        <v-icon @click="editReview(review)">mdi-pencil</v-icon>
+                                    </v-list-item-action>
 
-                            </v-card-actions>
-                            <v-list-item-subtitle class="my-1"> By
-                                {{ review.user.firstname }} {{ review.user.lastname }}
-                            </v-list-item-subtitle>
-                        </v-list-item>
-                    </v-list>
+                                </v-card-actions>
+                                <v-list-item-subtitle class="my-1"> By
+                                    {{ review.user.firstname }} {{ review.user.lastname }}
+                                </v-list-item-subtitle>
+                            </v-list-item>
+                        </v-list>
 
-                    <v-divider class="mx-2 my-5"></v-divider>
+                        <v-divider class="mx-2 my-5"></v-divider>
 
-                    <v-textarea v-model="review.review" label="Add review" outlined></v-textarea>
-                    <v-btn @click="addReview(review.review)" color="primary">Add review</v-btn>
-                </v-card-text>
-            </v-card>
+                        <v-textarea v-model="review.review" label="Add review" outlined></v-textarea>
+                        <v-btn @click="addReview(review.review)" color="primary">Add review</v-btn>
+                    </v-card-text>
+                </v-card>
+            </v-col>
         </v-row>
 
         <v-dialog v-model="editReviewDialog" max-width="500px">
