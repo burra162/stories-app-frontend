@@ -113,6 +113,53 @@ async function isFavoriteStory() {
     }
 }
 
+async function deleteReview(reviewId) {
+    if (!confirm("Are you sure you want to delete this review?")) {
+        return;
+    }
+    try {
+        await StoryService.deleteReview(reviewId);
+        snackbar.value = {
+            value: true,
+            color: "success",
+            text: "Review deleted",
+        };
+        getReviews();
+    } catch (error) {
+        snackbar.value.color = "red";
+        snackbar.value.text = "Error deleting review";
+        snackbar.value.value = true;
+    }
+}
+
+const editReviewDialog = ref(false);
+
+const reviewToEdit = ref(null);
+
+function editReview(review) {
+    reviewToEdit.value = review;
+    editReviewDialog.value = true;
+}
+
+
+async function updateReview() {
+    try {
+        await StoryService.updateReview(reviewToEdit.value);
+        snackbar.value = {
+            value: true,
+            color: "success",
+            text: "Review edited",
+        };
+        getReviews();
+        editReviewDialog.value = false;
+    } catch (error) {
+        snackbar.value.color = "red";
+        snackbar.value.text = "Error editing review";
+        snackbar.value.value = true;
+    }
+}
+
+
 </script>
 
 <template>
@@ -133,14 +180,18 @@ async function isFavoriteStory() {
                     {{ story.description }}
 
 
-
                     <v-divider v-if="reviews.length > 0" class="mx-2 my-5"></v-divider>
                     <v-list v-if="reviews.length > 0">
-                        <v-list-item  class="review my-3" v-for="review in reviews" :key="review.id">
-                            <v-list-item-title >
-                                {{ review.review }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle class="my-5"> By 
+                        <v-list-item class="review my-3" v-for="review in reviews" :key="review.id">
+                            <v-card-actions>
+                                <v-list-item-title> {{ review.review }} </v-list-item-title> <v-spacer></v-spacer>
+                                <v-list-item-action end v-if="review.user.id === user.id">
+                                    <v-icon class="mx-5" @click="deleteReview(review.id)">mdi-delete</v-icon>
+                                    <v-icon @click="editReview(review)">mdi-pencil</v-icon>
+                                </v-list-item-action>
+
+                            </v-card-actions>
+                            <v-list-item-subtitle class="my-1"> By
                                 {{ review.user.firstname }} {{ review.user.lastname }}
                             </v-list-item-subtitle>
                         </v-list-item>
@@ -153,6 +204,19 @@ async function isFavoriteStory() {
                 </v-card-text>
             </v-card>
         </v-row>
+
+        <v-dialog v-model="editReviewDialog" max-width="500px">
+            <v-card>
+                <v-card-title>Edit review</v-card-title>
+                <v-card-text>
+                    <v-textarea v-model="reviewToEdit.review" outlined></v-textarea>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="editReviewDialog = false">Close</v-btn>
+                    <v-btn variant="flat" @click="updateReview" color="primary">Update</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
         <v-snackbar v-model="snackbar.value" rounded="pill">
             {{ snackbar.text }}
@@ -168,10 +232,8 @@ async function isFavoriteStory() {
 
 
 <style scoped>
-
 .review {
     background-color: #cbf0f1;
     border-radius: 10px;
-    
 }
 </style>
