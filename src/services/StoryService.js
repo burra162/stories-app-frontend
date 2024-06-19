@@ -48,6 +48,30 @@ export default {
         return apiClient.get("stories/suggested/" + userId);
     },
 
+
+    // get all reading list stories for a user
+    getReadingList(userId) {
+        return apiClient.get("stories/readingList/" + userId);
+    },
+
+    // check if a story is in reading list for a user
+
+    isInReadingList(userId, storyId) {
+        return apiClient.get("stories/isReadingList/" + storyId + "/" + userId);
+    },
+
+    // add story to reading list for a user
+
+    addReadingList(userId, storyId) {
+        return apiClient.post("stories/addReadingList/" + storyId + "/" + userId);
+    },
+
+    // remove story from reading list for a user
+
+    removeReadingList(userId, storyId) {
+        return apiClient.delete("stories/removeReadingList/" + storyId + "/" + userId);
+    },
+
     // get all favorite stories for a user
     getFavoriteStories(userId) {
         return apiClient.get("stories/favorite/" + userId);
