@@ -3,6 +3,8 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import StoryService from "../services/StoryService.js";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const router = useRouter();
 const route = useRoute();
@@ -200,6 +202,39 @@ async function updateReview() {
 }
 
 
+
+function dateFormatted(updatedAt) {
+    const date = new Date(updatedAt);
+
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const formattedDate = date.toLocaleDateString('en-US', options);
+
+    return formattedDate;
+}
+
+async function generatePDF() {
+    const content = document.getElementById('pdf-area');
+
+    try {
+        const canvas = await html2canvas(content, { scale: 2 }); 
+        const imgData = canvas.toDataURL('image/png');
+        const doc = new jsPDF();
+        const imgWidth = doc.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        doc.save(`${story.value.title}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+    }
+}
+
 </script>
 
 <template>
@@ -208,22 +243,31 @@ async function updateReview() {
         <v-row class="mx-5 my-5">
             <v-col cols="12">
                 <v-card v-if="story !== null">
-                    <v-card-actions class="headline mx-5">
-                        <h3>{{ story.title }}</h3>
-                        <v-chip class="ma-2" color="primary" label>
-                            {{ story.genre }}
-                        </v-chip>
-                        <v-spacer></v-spacer>
-                        <v-icon v-if="!isFavorite" color="red" icon @click="addFavorite">mdi-heart-outline</v-icon>
-                        <v-icon v-else color="red" icon @click="removeFavorite">mdi-heart</v-icon>
+                    <div id="pdf-area" class="ma-3">
+                        <v-card-actions class="headline mx-5">
+                            <h3>{{ story.title }}</h3>
+                            <v-chip class="ma-2" color="primary" label>
+                                {{ story.genre }}
+                            </v-chip>
+                            <v-spacer></v-spacer>
+                            <div data-html2canvas-ignore="true">
 
-                        <v-icon v-if="!isInReadingList" color="blue" icon
-                            @click="addReadingList">mdi-bookmark-outline</v-icon>
-                        <v-icon v-else color="blue" icon @click="removeReadingList">mdi-bookmark</v-icon>
-                    </v-card-actions>
-                    <v-card-text>
-                        {{ story.description }}
+                                <v-icon color="cyan" @click="generatePDF" class="mx-3">mdi-file-pdf-box</v-icon>
 
+                                <v-icon v-if="!isFavorite" class="mx-3" color="red" icon
+                                    @click="addFavorite">mdi-heart-outline</v-icon>
+                                <v-icon v-else color="red" class="mx-3" icon @click="removeFavorite">mdi-heart</v-icon>
+
+                                <v-icon v-if="!isInReadingList" class="mx-3" color="blue" icon
+                                    @click="addReadingList">mdi-bookmark-outline</v-icon>
+                                <v-icon v-else color="blue" class="mx-3" icon
+                                    @click="removeReadingList">mdi-bookmark</v-icon>
+                            </div>
+                        </v-card-actions>
+                        <v-card-text class="mx-3">
+                            {{ story.description }}
+                        </v-card-text>
+                    </div> <v-card-text>
 
                         <v-divider v-if="reviews.length > 0" class="mx-2 my-5"></v-divider>
                         <v-list v-if="reviews.length > 0">
