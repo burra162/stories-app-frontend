@@ -35,4 +35,8 @@ export default {
   getUserGenres(userId) {
     return apiClient.get("users/" + userId + "/genres");
   },
+
+  deleteUser(userId) {
+    return apiClient.delete("users/" + userId);
+  }
 };

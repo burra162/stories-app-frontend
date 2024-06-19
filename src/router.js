@@ -36,6 +36,11 @@ const router = createRouter({
       path: "/story/:id",
       name: "story",
       component: () => import("./views/StoryPreviewPage.vue"),
+    },
+    {
+      path:"/users",
+      name: "users",
+      component: () => import("./views/UsersPage.vue"),
     }
   ],
 });

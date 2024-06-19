@@ -34,3 +34,14 @@ jobs:
           REMOTE_HOST: "ec2-50-17-26-173.compute-1.amazonaws.com"
           REMOTE_USER: ubuntu
           TARGET: "/var/www/html/story-frontend"
+      - run : echo "Deployed to server" 
+      - run : echo "Adding .htaccess file"
+      - run : echo "RewriteEngine On" >> dist/.htaccess
+      - run : echo "RewriteCond %{REQUEST_FILENAME} !-f" >> dist/.htaccess
+      - run : echo "RewriteCond %{REQUEST_FILENAME} !-d" >> dist/.htaccess
+      - run : echo "RewriteRule ^ index.html [L]" >> dist/.htaccess
+      - run : echo "Added .htaccess file"
+
+      - run : echo "Restarting apache server"
+      - run : sudo systemctl restart apache2
+      - run : echo "Apache server restarted"
