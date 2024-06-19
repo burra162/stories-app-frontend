@@ -47,6 +47,7 @@ onMounted(() => {
   isAdmin.value = user.value !== null && user.value.type === "admin";
   getGenres();
   getStories();
+  getMyStories();
   getFavoriteStories();
   getReadingList();
 });
@@ -93,7 +94,9 @@ function addStory() {
         published: false,
       };
       getStories();
-
+      getMyStories();
+      getFavoriteStories();
+      getReadingList();
     })
     .catch((error) => {
       snackbar.value.color = "error";
@@ -140,7 +143,9 @@ function editStory() {
       snackbar.value.value = true;
       closeEdit();
       getStories();
-      storyEdit.value = {
+      getMyStories();
+      getFavoriteStories();
+      getReadingList(); storyEdit.value = {
         title: "",
         description: "",
         genre: "",
@@ -153,6 +158,29 @@ function editStory() {
       snackbar.value.text = "Error updating story";
       snackbar.value.value = true;
     });
+}
+
+
+async function deleteStory(deletedStory) {
+  if(confirm("Are you sure you want to delete this story?") === false) return;
+
+  try {
+    await StoryService.deleteStory(deletedStory.id);
+    snackbar.value = {
+      value: true,
+      color: "green",
+      text: "Story deleted",
+    };
+    closeEdit();
+    getStories();
+    getMyStories();
+    getFavoriteStories();
+    getReadingList();
+  } catch (error) {
+    snackbar.value.color = "red";
+    snackbar.value.text = "Error deleting story";
+    snackbar.value.value = true;
+  }
 }
 
 const stories = ref([]);
@@ -253,6 +281,9 @@ function publish(message) {
       snackbar.value.value = true;
       closeModify();
       getStories();
+      getMyStories();
+      getFavoriteStories();
+      getReadingList();
     })
     .catch((error) => {
       snackbar.value.color = "error";
@@ -294,6 +325,20 @@ function getReadingList() {
     .catch((error) => {
       snackbar.value.color = "error";
       snackbar.value.text = "Error fetching reading list";
+      snackbar.value.value = true;
+    });
+}
+
+const myStories = ref([]);
+
+function getMyStories() {
+  StoryService.getUserStories(user.value.id)
+    .then((response) => {
+      myStories.value = response.data;
+    })
+    .catch((error) => {
+      snackbar.value.color = "error";
+      snackbar.value.text = "Error fetching my stories";
       snackbar.value.value = true;
     });
 }
@@ -351,9 +396,9 @@ function getReadingList() {
       </v-row>
 
 
-      <v-row align="center" v-if="favoriteStories.length>0" class="mb-4">
+      <v-row align="center" v-if="favoriteStories.length > 0" class="mb-4">
         <v-col cols="10">
-          <v-card-title  class="pl-0 text-h4 font-weight-bold">Favorite Stories
+          <v-card-title class="pl-0 text-h4 font-weight-bold">Favorite Stories
           </v-card-title>
         </v-col>
       </v-row>
@@ -381,9 +426,9 @@ function getReadingList() {
         </v-col>
       </v-row>
 
-      <v-row align="center" v-if="readingList.length>0" class="mb-4">
+      <v-row align="center" v-if="readingList.length > 0" class="mb-4">
         <v-col cols="10">
-          <v-card-title  class="pl-0 text-h4 font-weight-bold">Reading List
+          <v-card-title class="pl-0 text-h4 font-weight-bold">Reading List
           </v-card-title>
         </v-col>
       </v-row>
@@ -409,7 +454,37 @@ function getReadingList() {
             </v-card-actions>
           </v-card>
         </v-col>
-        </v-row>
+      </v-row>
+
+      <v-row align="center" v-if="myStories.length > 0" class="mb-4">
+        <v-col cols="10">
+          <v-card-title class="pl-0 text-h4 font-weight-bold">My Stories
+          </v-card-title>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col v-for="story in myStories" :key="story.id" cols="12" md="6" lg="3">
+          <v-card class="mb-4">
+            <v-card-title @click="openStory(story)" class="headline">{{ story.title }}
+              <v-chip class="ma-2" color="primary" label>
+                {{ story.genre }}
+              </v-chip>
+            </v-card-title>
+            <v-card-text @click="openStory(story)" v-if="story.description.length > 0" class="single-line-text">
+              {{ story.description }}
+            </v-card-text>
+            <v-card-text @click="openStory(story)" v-else class="single-line-text">
+              Start writing a story.
+            </v-card-text>
+            <v-card-actions v-if="story.userId === user.id || isAdmin">
+              <v-btn color="primary" @click="openEdit(story)">Edit</v-btn>
+              <v-spacer></v-spacer>
+              <v-btn color="green" @click="openModify(story)">Modify story</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
 
 
       <v-dialog persistent v-model="addDialog" max-width="800px">
@@ -455,6 +530,7 @@ function getReadingList() {
             </v-container>
           </v-card-text>
           <v-card-actions>
+            <v-btn color="red" @click="deleteStory(storyEdit)">Delete</v-btn>
             <v-spacer></v-spacer>
             <v-btn variant="flat" color="secondary" text @click="closeEdit()">Close</v-btn>
             <v-btn variant="flat" color="primary" text @click="editStory()">Save</v-btn>

@@ -6,6 +6,10 @@ export default {
         return apiClient.get("stories");
     },
 
+    getUserStories(userId) {
+        return apiClient.get("stories/user/" + userId);
+    },
+
     getStory(id) {
         return apiClient.get("stories/" + id);
     },
