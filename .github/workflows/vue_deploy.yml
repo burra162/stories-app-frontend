@@ -1,6 +1,5 @@
 name: AWS DEPLOY TO STAGING
 
-#turn off deploy to AWS
 on:
   pull_request:
     types: [closed]
@@ -10,15 +9,12 @@ on:
 jobs:
   aws-deploy:
     runs-on: ubuntu-latest
-    #For google auth
 
     steps:
       - uses: actions/checkout@v2
-        # may need to change to version 3
         with:
           ref: dev
       - uses: actions/setup-node@v3
-        #May need to change to version 18
         with:
           node-version: 16
 
@@ -34,14 +30,7 @@ jobs:
           REMOTE_HOST: "ec2-50-17-26-173.compute-1.amazonaws.com"
           REMOTE_USER: ubuntu
           TARGET: "/var/www/html/story-frontend"
-      - run : echo "Deployed to server" 
-      - run : echo "Adding .htaccess file"
-      - run : echo "RewriteEngine On" >> dist/.htaccess
-      - run : echo "RewriteCond %{REQUEST_FILENAME} !-f" >> dist/.htaccess
-      - run : echo "RewriteCond %{REQUEST_FILENAME} !-d" >> dist/.htaccess
-      - run : echo "RewriteRule ^ index.html [L]" >> dist/.htaccess
-      - run : echo "Added .htaccess file"
 
-      - run : echo "Restarting apache server"
-      - run : sudo systemctl restart apache2
-      - run : echo "Apache server restarted"
+      - name: Copy .htaccess to server
+        run: |
+          scp -i ${{ secrets.SERVER_SSH_KEY }} .htaccess ubuntu@ec2-50-17-26-173.compute-1.amazonaws.com:/var/www/html/story-frontend/.htaccess
